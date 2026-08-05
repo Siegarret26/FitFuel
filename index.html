@@ -1669,21 +1669,19 @@ const THEMES = {
 };
 const FONT_SIZES = { small:"13px", medium:"15px", large:"17px" };
 /* ══════════════════════════════════════════════════════════════
-   PASTE YOUR GEMINI API KEY HERE — this is the only line you need to edit.
-   Replace the text inside the quotes (keep the quotes and semicolon).
-   Get a free key at https://aistudio.google.com/apikey
+   PASTE YOUR CLOUDFLARE WORKER URL HERE — this is the only line you edit.
+   It looks like: https://fitfuel-proxy.YOUR-NAME.workers.dev
+   The Gemini API key lives on that Worker, never in this file — which is what
+   stops Google from auto-revoking it for being published publicly.
    ══════════════════════════════════════════════════════════════ */
-const GEMINI_API_KEY = "AQ.Ab8RN6KpYjwK0AFzElL4fS1tkQmWQ3JrLP8zkMV_TmYGkfqCnA";
+const GEMINI_PROXY_URL = "https://fitfuel-proxy.maraon-siegfriedclarence.workers.dev";
 /* Optional: change the model. "gemini-flash-latest" is Google's auto-updating
    alias — it always points at their current flash model, so it won't break when
-   they retire an older one. Only change this if you specifically want a
-   different/pinned model (see aistudio.google.com for current model names). */
+   they retire an older one. */
 const GEMINI_MODEL = "gemini-flash-latest";
-// If the line above hasn't been edited yet, treat it as "no key configured" so
-// every existing "please add an API key" message still works. Deliberately does
-// NOT repeat the placeholder text, so find-and-replace can't break this check.
-const RESOLVED_GEMINI_API_KEY =
-  (GEMINI_API_KEY && !GEMINI_API_KEY.startsWith("YOUR_")) ? sanitizeApiKey(GEMINI_API_KEY) : "";
+/* If no proxy URL is set above, FitFuel falls back to asking each user for their
+   own API key in Settings → AI Coach. With a proxy set, no key is needed. */
+const RESOLVED_GEMINI_API_KEY = GEMINI_PROXY_URL ? "proxy" : "";
 
 const DEFAULT_SETTINGS = {
   theme:"dark", customAccent:"#FF3B3B", customBg:"#070709",
@@ -1698,9 +1696,12 @@ function loadSettings(){
     const s=localStorage.getItem("ff_s");
     if(!s) return null;
     const parsed=JSON.parse(s);
-    // The key/model are hardcoded above, not user-editable — always use those,
-    // regardless of anything saved in this browser from before that was true.
-    if(parsed){ parsed.aiApiKey=RESOLVED_GEMINI_API_KEY; parsed.aiModel=GEMINI_MODEL; }
+    if(parsed){
+      parsed.aiModel=GEMINI_MODEL;
+      // With a proxy configured, ignore any key saved in this browser from before.
+      if(GEMINI_PROXY_URL) parsed.aiApiKey="proxy";
+      else if(typeof parsed.aiApiKey==="string") parsed.aiApiKey=sanitizeApiKey(parsed.aiApiKey);
+    }
     return parsed;
   }catch{ return null; }
 }
@@ -1959,8 +1960,20 @@ function _geminiText(candidateResponse){
   const parts=candidateResponse?.candidates?.[0]?.content?.parts||[];
   return parts.map(p=>p.text||"").join("");
 }
-function _geminiUrl(model,method){
-  return `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model||"gemini-flash-latest")}:${method}`;
+function _geminiUrl(model,method,stream){
+  const m=encodeURIComponent(model||GEMINI_MODEL);
+  if(GEMINI_PROXY_URL){
+    return `${GEMINI_PROXY_URL}?model=${m}&method=${method}${stream?"&stream=1":""}`;
+  }
+  // Fallback: direct call using a key supplied in Settings (see GEMINI_PROXY_URL note above).
+  return `https://generativelanguage.googleapis.com/v1beta/models/${m}:${method}`+(stream?"?alt=sse":"");
+}
+/* Auth headers are only needed when calling Google directly. When going through the
+   proxy, the key lives on the server and must never be sent from the browser. */
+function _geminiHeaders(apiKey){
+  return GEMINI_PROXY_URL
+    ? { "Content-Type":"application/json" }
+    : { "Content-Type":"application/json", "x-goog-api-key":sanitizeApiKey(apiKey) };
 }
 /* HTTP header values must be plain ASCII. A key copy-pasted from a doc/notes app can pick up
    "smart" typographic substitutes (en-dash instead of hyphen, curly quotes, etc.) that the
@@ -1999,9 +2012,9 @@ async function streamGeminiChat({apiKey,model,messages,onToken,onDone,onError}){
   if(!apiKey){ onError&&onError("No Gemini API key configured. Add one in Settings → AI Coach."); return; }
   try{
     const {systemInstruction,contents}=convertMessagesToGemini(messages);
-    const res=await _scheduleGeminiFetch(_geminiUrl(model,"streamGenerateContent")+"?alt=sse",{
+    const res=await _scheduleGeminiFetch(_geminiUrl(model,"streamGenerateContent",true),{
       method:"POST",
-      headers:{ "Content-Type":"application/json", "x-goog-api-key":sanitizeApiKey(apiKey) },
+      headers:_geminiHeaders(apiKey),
       body:JSON.stringify({ contents, systemInstruction, generationConfig:{ temperature:0.7 } }),
     });
     if(!res.ok||!res.body){
@@ -2050,7 +2063,7 @@ async function completeGeminiJSON({apiKey,model,messages}){
     const {systemInstruction,contents}=convertMessagesToGemini(messages);
     const res=await _scheduleGeminiFetch(_geminiUrl(model,"generateContent"),{
       method:"POST",
-      headers:{ "Content-Type":"application/json", "x-goog-api-key":sanitizeApiKey(apiKey) },
+      headers:_geminiHeaders(apiKey),
       body:JSON.stringify({ contents, systemInstruction, generationConfig:{ temperature:0.6, responseMimeType:"application/json" } }),
     });
     if(!res.ok){
@@ -2080,7 +2093,7 @@ async function completeGeminiText({apiKey,model,messages}){
   const {systemInstruction,contents}=convertMessagesToGemini(messages);
   const res=await _scheduleGeminiFetch(_geminiUrl(model,"generateContent"),{
     method:"POST",
-    headers:{ "Content-Type":"application/json", "x-goog-api-key":sanitizeApiKey(apiKey) },
+    headers:_geminiHeaders(apiKey),
     body:JSON.stringify({ contents, systemInstruction, generationConfig:{ temperature:0.7, maxOutputTokens:150 } }),
   });
   if(!res.ok) throw new Error(describeAIError(res.status)||`Gemini request failed (${res.status}).`);
@@ -6805,13 +6818,23 @@ function SettingsPage({settings,onUpdate,user}){
           <h2 style={{fontSize:17,fontWeight:800,color:"var(--text)"}}>AI Coach</h2>
         </div>
         <p style={{fontSize:13,color:"var(--text-mid)",marginBottom:20,lineHeight:1.6}}>
-          FitFuel has no server, so the AI Coach calls Gemini directly from your browser. This site uses a shared key configured by the developer — nothing for you to set up.
+          {GEMINI_PROXY_URL
+            ? "The AI Coach is ready to use — requests go through a secure server, so there's nothing for you to set up."
+            : <>This site has no AI server configured, so the AI Coach needs your own Gemini API key. It's stored only on this device and sent straight to Google. Get a free key at <span style={{color:"var(--accent)"}}>aistudio.google.com/apikey</span>.</>}
         </p>
-        <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderRadius:12,background:"var(--bg3)",marginBottom:16,flexWrap:"wrap"}}>
-          <span style={{fontSize:13,color:"var(--text-mid)"}}>Model: <strong style={{color:"var(--text)"}}>{s.aiModel}</strong></span>
-          <span style={{fontSize:13,color:"var(--text-mid)"}}>·</span>
-          <span style={{fontSize:13,color:"var(--text-mid)"}}>Key: <strong style={{color:"var(--text)"}}>{s.aiApiKey?"Configured ✓":"Not set up yet"}</strong></span>
-        </div>
+        {GEMINI_PROXY_URL
+          ? <div style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderRadius:12,background:"var(--bg3)",marginBottom:16,flexWrap:"wrap"}}>
+              <span style={{fontSize:13,color:"var(--text-mid)"}}>Model: <strong style={{color:"var(--text)"}}>{s.aiModel}</strong></span>
+              <span style={{fontSize:13,color:"var(--text-mid)"}}>·</span>
+              <span style={{fontSize:13,color:"var(--text-mid)"}}>Status: <strong style={{color:"var(--text)"}}>Ready ✓</strong></span>
+            </div>
+          : <div style={{marginBottom:16}}>
+              <label style={{fontSize:13,color:"var(--text-mid)",display:"block",marginBottom:8,fontWeight:500}}>Gemini API Key</label>
+              <div style={{display:"flex",gap:8,maxWidth:420}}>
+                <input type={showKey?"text":"password"} value={s.aiApiKey} onChange={e=>{upd({aiApiKey:sanitizeApiKey(e.target.value)});setTestState(null);}} placeholder="AQ.… or AIza…" style={{flex:1,padding:"10px 12px",borderRadius:10,border:"1px solid var(--border-strong)",fontSize:13,background:"var(--card)",color:"var(--text)"}}/>
+                <button onClick={()=>setShowKey(v=>!v)} style={{padding:"0 14px",borderRadius:10,border:"1px solid var(--border-strong)",background:"var(--bg3)",color:"var(--text-mid)",cursor:"pointer",fontSize:13}}>{showKey?"Hide":"Show"}</button>
+              </div>
+            </div>}
         <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
           <button className="btn-secondary" style={{padding:"9px 20px",fontSize:13}} onClick={testKey} disabled={!s.aiApiKey||testState==="testing"}>{testState==="testing"?"Testing…":"Test Connection"}</button>
           {testState==="ok"&&<span style={{fontSize:13,color:"#38D978",fontWeight:600}}>✓ Connected</span>}
