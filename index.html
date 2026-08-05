@@ -1674,7 +1674,7 @@ const FONT_SIZES = { small:"13px", medium:"15px", large:"17px" };
    The Gemini API key lives on that Worker, never in this file — which is what
    stops Google from auto-revoking it for being published publicly.
    ══════════════════════════════════════════════════════════════ */
-const GEMINI_PROXY_URL = "https://fitfuel-proxy.maraon-siegfriedclarence.workers.dev";
+const GEMINI_PROXY_URL = "";
 /* Optional: change the model. "gemini-flash-latest" is Google's auto-updating
    alias — it always points at their current flash model, so it won't break when
    they retire an older one. */
@@ -1815,11 +1815,26 @@ async function classifyAndFulfill({apiKey,model,userText,contextSummary,workoutC
 
 First classify their message into exactly one intent: "workout" (wants an exercise routine), "meal" (wants a meal/recipe/food suggestion), "plan" (wants a multi-week training program), "report" (wants their progress/weekly summary/stats), or "chat" (anything else — questions, advice, motivation, explanations, greetings, follow-ups).
 
-If intent is "workout": search the given workout catalog for a strong match to their request, equipment, and experience level. If a strong match exists, set found:true and matchedId to that catalog item's id exactly as given. If nothing matches well, set found:false and fill "generated" with a new workout: {"name":string,"description":string,"difficulty":"Beginner"|"Intermediate"|"Advanced","duration":number,"calories":number,"equipment":string[],"muscles":string[],"warmup":string[],"exercises":[{"name":string,"sets":number,"reps":string,"rest":string,"tempo":string}],"cooldown":string[]}.
+⚠️ MOST IMPORTANT RULE — RECOMMEND FROM THE CATALOG, DON'T INVENT:
+FitFuel already has a curated library of workouts and meals with real photos, tested instructions, and full app integration (start/track/save). Generated content has none of that. So recommending an existing item is ALMOST ALWAYS the better answer.
 
-If intent is "meal": search the given meal catalog the same way. Generated shape if needed: {"name":string,"category":"Breakfast"|"Lunch"|"Dinner"|"Snacks"|"Vegetarian","calories":number,"protein":number,"carbs":number,"fat":number,"ingredients":string[],"instructions":string[],"prepTime":number,"cookTime":number}.
+Set found:true and recommend a catalog item whenever ANY item is a reasonable fit — it does NOT need to be perfect. Judge by the main thing they asked for (e.g. body part, category, goal, meal type). A leg workout request should match ANY leg/lower-body workout in the catalog. A high-protein dinner request should match ANY high-protein dinner.
 
-If intent is "plan": search the given plan catalog the same way. Generated shape if needed: {"name":string,"goal":string,"weeks":[{"weekNumber":number,"focus":string,"sessions":[{"day":string,"type":string,"description":string}]}]}.
+Do NOT set found:false merely because:
+- you could write something more precisely tailored
+- the catalog item isn't an exact wording match
+- you want to vary the duration, difficulty, or exact exercises
+- there are several options and none is obviously "the best" (just pick the closest one)
+
+Only set found:false when the catalog genuinely contains NOTHING relevant — e.g. they asked for a swimming workout and there are no swimming workouts at all, or a dessert recipe and there are no desserts. If in doubt, set found:true.
+
+If intent is "workout": search the workout catalog per the rule above. When found, set found:true and matchedId to that catalog item's id exactly as given. Only if genuinely nothing is relevant, set found:false and fill "generated": {"name":string,"description":string,"difficulty":"Beginner"|"Intermediate"|"Advanced","duration":number,"calories":number,"equipment":string[],"muscles":string[],"warmup":string[],"exercises":[{"name":string,"sets":number,"reps":string,"rest":string,"tempo":string}],"cooldown":string[]}.
+
+If intent is "meal": same rule. Generated shape if genuinely needed: {"name":string,"category":"Breakfast"|"Lunch"|"Dinner"|"Snacks"|"Vegetarian","calories":number,"protein":number,"carbs":number,"fat":number,"ingredients":string[],"instructions":string[],"prepTime":number,"cookTime":number}.
+
+If intent is "plan": same rule. Note the plan library is often empty for new users — generating is expected here if it is. Generated shape: {"name":string,"goal":string,"weeks":[{"weekNumber":number,"focus":string,"sessions":[{"day":string,"type":string,"description":string}]}]}.
+
+When found:true, write "reply" as a natural sentence introducing the match, e.g. "I found a workout in FitFuel that fits — here's Leg Strength Builder."
 
 If intent is "report" or "chat", omit found/matchedId/generated entirely — those are handled elsewhere.
 
