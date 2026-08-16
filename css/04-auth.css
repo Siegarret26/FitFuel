@@ -1,0 +1,147 @@
+/* FitFuel — Login, sign-up and onboarding survey
+   Loaded by index.html in order. */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex; align-items: stretch;
+  background: var(--bg);
+}
+.auth-panel {
+  flex: 1; padding: 48px 40px;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  max-width: 480px;
+  margin: 0 auto;
+}
+.auth-visual {
+  flex: 1.1;
+  position: relative; overflow: hidden;
+  min-height: 320px;
+  display: none;
+}
+@media (min-width: 860px) { .auth-visual { display: block; } }
+.auth-visual img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+.auth-visual-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to right, var(--auth-overlay-start) 0%, var(--auth-overlay-mid) 40%, transparent 80%);
+}
+.auth-visual-text {
+  position: absolute; bottom: 56px; left: 52px; max-width: 360px;
+}
+.auth-card {
+  width: 100%;
+  background: var(--card);
+  border: 1px solid var(--border-strong);
+  border-radius: 28px;
+  padding: 40px 36px;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+}
+.auth-badge {
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 20px;
+}
+.auth-tab-bar {
+  display: flex; background: var(--bg3);
+  border-radius: 12px; padding: 4px; gap: 3px; margin-bottom: 28px;
+}
+.auth-tab {
+  flex: 1; padding: 9px;
+  border: none; border-radius: 9px; cursor: pointer;
+  font-weight: 600; font-size: 14px;
+  transition: all 0.2s; background: transparent; color: var(--text-mid);
+}
+.auth-tab.active { background: var(--accent); color: #fff; }
+.auth-field { margin-bottom: 16px; }
+.auth-field label {
+  display: block; font-size: 11px; font-weight: 700;
+  color: var(--text-mid); letter-spacing: 0.07em; margin-bottom: 7px;
+}
+.auth-field input {
+  width: 100%; padding: 12px 14px;
+  border-radius: 12px; border: 1.5px solid var(--border-strong);
+  font-size: 14px; font-weight: 500;
+}
+.auth-error {
+  padding: 11px 16px; background: rgba(255,59,59,0.12);
+  border: 1px solid rgba(255,59,59,0.28); border-radius: 12px;
+  font-size: 13px; color: #FF8A8A; margin-bottom: 16px;
+}
+.auth-success {
+  padding: 11px 16px; background: rgba(56,217,120,0.12);
+  border: 1px solid rgba(56,217,120,0.25); border-radius: 12px;
+  font-size: 13px; color: #38D978; margin-bottom: 16px;
+}
+
+/* ═══════════════════════════════════════════
+   ONBOARDING SURVEY (Feature 5)
+═══════════════════════════════════════════ */
+.onboarding-page {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--bg);
+  padding: 40px 20px;
+}
+.onboarding-card {
+  width: 100%; max-width: 520px;
+  background: var(--card);
+  border: 1px solid var(--border-strong);
+  border-radius: 28px;
+  padding: 40px 36px;
+  box-shadow: 0 30px 70px rgba(0,0,0,0.5);
+}
+.onboarding-progress-head {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 10px;
+}
+.onboarding-step-label {
+  font-size: 11px; font-weight: 700; color: var(--text-mid);
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+.onboarding-progress-track {
+  width: 100%; height: 6px; border-radius: 3px;
+  background: var(--bg3); overflow: hidden;
+}
+.onboarding-progress-fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(to right, var(--accent-dark), var(--accent));
+  transition: width 350ms ease;
+}
+.onboarding-field-label {
+  display: block; font-size: 13.5px; font-weight: 700;
+  color: var(--text); margin-bottom: 10px;
+}
+.onboarding-options { display: flex; flex-wrap: wrap; gap: 8px; }
+.onboarding-chip {
+  padding: 9px 16px; border-radius: 50px;
+  border: 1.5px solid var(--border-strong);
+  background: var(--bg3); color: var(--text-mid);
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: all 0.18s ease;
+}
+.onboarding-chip:hover { border-color: var(--accent-tint-4); color: var(--text); }
+.onboarding-chip.selected {
+  background: var(--accent); border-color: var(--accent); color: #fff;
+}
+.onboarding-input {
+  width: 100%; padding: 12px 14px;
+  border-radius: 12px; border: 1.5px solid var(--border-strong);
+  font-size: 14px; font-weight: 500;
+  background: var(--bg3); color: var(--text);
+}
+
+/* Home page personalised greeting (fed by onboarding data) */
+.home-greeting-card {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap;
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: 20px; padding: 20px 26px;
+}
+.home-greeting-hello { font-size: 18px; font-weight: 800; color: var(--text); margin-bottom: 4px; }
+.home-greeting-sub { font-size: 13.5px; color: var(--text-mid); }
+
+/* ═══════════════════════════════════════════
+   GPS ACTIVITY TRACKING (Feature 6)
+═══════════════════════════════════════════ */
