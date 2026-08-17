@@ -1,0 +1,205 @@
+/* FitFuel — Meal cards and recipe modals
+   Loaded by index.html in order. */
+
+.meal-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.meal-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 14px 40px rgba(0,0,0,0.5), 0 0 0 1px var(--accent-tint-2);
+  border-color: var(--accent-tint-3);
+}
+.meal-card:hover .meal-card-img { transform: scale(1.06); }
+.meal-card-img-wrap { position: relative; overflow: hidden; aspect-ratio: 4/3; }
+.meal-card-img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block; transition: transform 0.5s ease;
+}
+.meal-card-img-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(7,7,9,0.75) 0%, transparent 50%);
+}
+.meal-save-btn {
+  position: absolute; top: 12px; right: 12px;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(7,7,9,0.65); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.15);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 17px;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+.meal-save-btn:hover { background: rgba(7,7,9,0.85); transform: scale(1.1); }
+.meal-save-btn.saved { background: var(--accent-tint-4); border-color: var(--accent-tint-5); box-shadow: 0 0 12px var(--accent-tint-3); }
+.meal-cat-pill {
+  position: absolute; bottom: 12px; left: 12px;
+  background: rgba(7,7,9,0.72); backdrop-filter: blur(6px);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px; padding: 4px 12px;
+  font-size: 11px; font-weight: 700; color: rgba(255,255,255,0.85);
+  letter-spacing: 0.04em; text-transform: uppercase;
+}
+.meal-card-body { padding: 18px 18px 20px; }
+.meal-card-name { font-size: 16px; font-weight: 800; color: var(--text); margin-bottom: 10px; }
+.meal-macros { display: flex; gap: 14px; margin-bottom: 14px; flex-wrap: wrap; }
+.meal-macro { text-align: center; }
+.meal-macro-val { font-size: 15px; font-weight: 800; }
+.meal-macro-label { font-size: 10px; font-weight: 600; color: var(--text-mid); letter-spacing: 0.04em; margin-top: 1px; }
+.meal-cal { font-size: 14px; font-weight: 700; color: var(--accent); }
+.meal-ingredients { list-style: none; }
+.meal-ingredients li {
+  font-size: 12px; color: var(--text-mid);
+  padding: 4px 0; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 7px;
+}
+.meal-ingredients li:last-child { border-bottom: none; }
+.meal-ingredients li::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+
+/* ═══════════════════════════════════════════
+   PROGRESS PAGE
+═══════════════════════════════════════════ */
+.streak-card {
+  background: linear-gradient(135deg, var(--accent-bg-deep) 0%, var(--accent-tint-3) 50%, var(--accent-bg-deep) 100%);
+  border: 1px solid var(--accent-tint-3);
+  border-radius: var(--r); padding: 32px;
+  box-shadow: 0 0 40px var(--accent-tint-2), var(--shadow-card);
+  position: relative; overflow: hidden;
+}
+.streak-bg-glow {
+  position: absolute; top: -30px; right: -30px;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, var(--accent-tint-3) 0%, transparent 70%);
+  pointer-events: none;
+}
+.streak-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 90px; line-height: 0.85;
+  color: var(--text); margin-bottom: 8px;
+}
+.week-day-grid { display: flex; gap: 8px; justify-content: space-between; }
+.week-day {
+  flex: 1; text-align: center; cursor: pointer;
+  padding: 10px 4px 8px;
+  border-radius: 14px;
+  border: 2px solid var(--border-strong);
+  background: var(--bg3);
+  transition: all 0.2s;
+  user-select: none;
+}
+.week-day.done {
+  background: var(--accent-tint-2);
+  border-color: var(--accent-tint-5);
+}
+.week-day:hover { border-color: var(--accent); }
+.week-day-check {
+  width: 30px; height: 30px; border-radius: 50%;
+  margin: 0 auto 7px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 800;
+  background: var(--bg2);
+  border: 2px solid var(--border-strong);
+  color: transparent;
+  transition: all 0.2s;
+}
+.week-day.done .week-day-check {
+  background: var(--accent);
+  border-color: var(--accent-dark);
+  color: #fff;
+}
+.week-day-label { font-size: 10px; font-weight: 700; color: var(--text-light); letter-spacing: 0.05em; text-transform: uppercase; }
+.week-day.done .week-day-label { color: var(--accent); }
+.stat-card {
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.stat-card-icon { font-size: 24px; margin-bottom: 4px; }
+.stat-card-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 38px; line-height: 1; color: var(--text);
+}
+.stat-card-label { font-size: 12px; font-weight: 600; color: var(--text-mid); letter-spacing: 0.04em; }
+.habit-row { margin-bottom: 22px; }
+.habit-row-head {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 8px;
+}
+.habit-label { font-size: 14px; font-weight: 600; color: var(--text-mid); }
+.habit-pct { font-size: 13px; font-weight: 700; }
+.mood-btn {
+  background: var(--bg3); border: 2px solid var(--border-strong);
+  border-radius: 14px; padding: 10px 14px;
+  cursor: pointer; font-size: 26px; text-align: center;
+  transition: all 0.18s;
+  flex: 1;
+}
+.mood-btn:hover { border-color: var(--accent); transform: scale(1.08); }
+.mood-btn.active { background: var(--accent-tint-2); border-color: var(--accent); transform: scale(1.1); }
+.achievement-card {
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 16px; padding: 18px 20px;
+  display: flex; align-items: center; gap: 16px;
+}
+.achievement-icon {
+  width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+}
+
+/* ═══════════════════════════════════════════
+   PROFILE PAGE
+═══════════════════════════════════════════ */
+.profile-header {
+  background: linear-gradient(130deg, var(--bg2) 0%, var(--accent-tint-1) 60%, var(--bg2) 100%);
+  border: 1px solid var(--border);
+  border-radius: var(--r); padding: 32px;
+  margin-bottom: 24px;
+  position: relative; overflow: hidden;
+}
+.profile-header-glow {
+  position: absolute; top: -50%; right: -10%;
+  width: 350px; height: 350px;
+  background: radial-gradient(circle, var(--accent-tint-2) 0%, transparent 65%);
+  pointer-events: none;
+}
+.profile-avatar {
+  width: 88px; height: 88px; border-radius: 50%;
+  background: var(--bg3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 46px; border: 3px solid var(--accent);
+  box-shadow: 0 0 24px var(--accent-tint-3);
+  flex-shrink: 0;
+}
+.profile-stat { text-align: center; }
+.profile-stat-val { font-family: 'Bebas Neue', sans-serif; font-size: 30px; color: var(--accent); line-height: 1; margin-bottom: 3px; }
+.profile-stat-label { font-size: 11px; font-weight: 600; color: var(--text-mid); letter-spacing: 0.05em; text-transform: uppercase; }
+.goal-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 13px 16px; background: var(--bg3);
+  border-radius: 14px; border: 1px solid var(--border);
+}
+.goal-check { width: 22px; height: 22px; border-radius: 50%; background: var(--accent-tint-2); display: flex; align-items: center; justify-content: center; font-size: 12px; color: var(--accent); flex-shrink: 0; }
+.bmi-gauge-wrap { text-align: center; padding: 8px 0 12px; }
+.bmi-track {
+  position: relative; height: 14px; background: var(--bg3);
+  border-radius: 20px; overflow: visible; margin: 0 8px;
+}
+.bmi-fill { height: 100%; border-radius: 20px; transition: width 0.8s cubic-bezier(.4,0,.2,1); }
+.bmi-marker {
+  position: absolute; top: -5px;
+  width: 24px; height: 24px; border-radius: 50%;
+  background: #fff; border: 3px solid var(--accent);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.4);
+  transform: translateX(-50%);
+  transition: left 0.8s cubic-bezier(.4,0,.2,1);
+}
+.health-metric-card {
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 16px; padding: 20px;
+}
+
+/* ═══════════════════════════════════════════
+   SETTINGS PAGE
+═══════════════════════════════════════════ */
