@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<title>FitFuel — Train Smarter</title>
+<meta name="description" content="Workouts, meals, GPS activity tracking, and an AI coach — free, in your browser."/>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#FF3B3B"/>
+<link rel="icon" type="image/png" sizes="32x32" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACnklEQVR42u2Xv2uTQRjHP/fmfd808U1N0lZs2qoRoURBQVAHXaQguigOugjO6uTmoosIouBfoIs4ioM46KQgFARxEk3VKm3U1iZR0yZpft17j4NaSqhtFpMO+Y7H8Xw/97077h7FCgoGQ8J/UK1WUc1jqh3Gq4FY7TZv9rLabd4MYdFhqU6sfrk6nkAXoAvQcQB7JaKAUjRE2OK6RB2bnw1NwnF4nBolKIIBjAi2bfO0UMBGcTgWpa71Uo2C1hx5/wFLKRZ9Q6ZeR4usDfC3+JDr8mJXil7H4X4uT80YwrYNWhNwnN+TRcg3NKfiMfB9XNcFEQgEeJnNcje5jZ29vdyb/ca56UxrCewM9XAyFmPfhjDxPwXf1WpcGOgHETL1OrcynwEoap/TfTFs26auNTenM8w1GgSUYshxODYcR4xhxHW5nBjk2szs2mfgxsgwV7YnORqNYkRIl8t4lsWmnh58rakYQ8JxGHFdvjQaHPQ8xBjqxuBZFltDId5UquwNh38nqjVj/X2cG+hvLYEdrkuuVGKDZRFyHJ4XS4xFPOTP2RiNRLjU14cuFkk4DhHXxWiNFwxyMbkNjEH7PgciHr7WVIFStcqVrzOtAexPT3AnmeTE4Gb8cpmc1uzxPDCGnNY8+/4DCQQYn5/n/KYBEEFEeJT/zqIIE+UyqXAYLxwGrTmTnmC8VKLom9YAir7h9eIi/lyWVwsLHIp4WJYFSnF1aprbuTwAx6MbSXkeiDBeKnNq8uNSjevDQzyYyzJVqfBkfmHp5yOtvIbLJ0YCFpk9uwnZNjPVGvveplnwfQS4v2M7R+NxfGM4O/mJh4UCtlJoEfym6/Yv8+5z3AXoAqwPgJXapXapVquo9bEFnUjhr6e1WufajuZUdbo9/wXsYilPR/sY6wAAAABJRU5ErkJggg=="/>
+<link rel="icon" href="icons/favicon.ico" sizes="any"/>
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"/>
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="FitFuel"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+
+<!-- Third-party libraries (CDN) -->
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" defer></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" defer></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js" defer></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
+<link href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" rel="stylesheet"/>
+<script src="https://unpkg.com/chart.js@4.4.4/dist/chart.umd.js" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+
+<!-- Firebase (compat build) -->
+<script src="https://www.gstatic.com/firebasejs/12.17.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.17.0/firebase-firestore-compat.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyCQ-zqVjkDbr86bjPj33H1yLS-X46H_Nzo",
+    authDomain: "fitfuel-605b0.firebaseapp.com",
+    projectId: "fitfuel-605b0",
+    storageBucket: "fitfuel-605b0.firebasestorage.app",
+    messagingSenderId: "577611668703",
+    appId: "1:577611668703:web:b9f3286d704a662c3f5d6a",
+  });
+</script>
+
+<!-- Stylesheets -->
+<link rel="stylesheet" href="css/01-base.css"/>
+<link rel="stylesheet" href="css/02-components.css"/>
+<link rel="stylesheet" href="css/03-navigation.css"/>
+<link rel="stylesheet" href="css/04-auth.css"/>
+<link rel="stylesheet" href="css/05-activity.css"/>
+<link rel="stylesheet" href="css/06-home.css"/>
+<link rel="stylesheet" href="css/07-workouts.css"/>
+<link rel="stylesheet" href="css/08-meals.css"/>
+<link rel="stylesheet" href="css/09-settings.css"/>
+<link rel="stylesheet" href="css/10-modals.css"/>
+<link rel="stylesheet" href="css/11-ai-coach.css"/>
+<link rel="stylesheet" href="css/12-landing.css"/>
+<link rel="stylesheet" href="css/13-features.css"/>
+</head>
+<body>
+<div id="root">
+  <div id="ff-fallback" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;gap:14px;background:#070709;color:#F0F0F5;font-family:sans-serif;">
+    <div style="width:36px;height:36px;border:3px solid rgba(255,59,59,0.25);border-top-color:#FF3B3B;border-radius:50%;animation:ff-spin 0.8s linear infinite;"></div>
+    <div style="font-size:14px;color:#8B8D97;">Loading FitFuel…</div>
+  </div>
+</div>
+<style>@keyframes ff-spin{to{transform:rotate(360deg)}}</style>
+<script>
+  // If React/Babel fail to load (blocked by network, ad-blocker, etc.)
+  // show a clear message instead of leaving a blank/stuck page.
+  window.addEventListener("load", function(){
+    setTimeout(function(){
+      if (typeof React === "undefined" || typeof Babel === "undefined") {
+        var el = document.getElementById("ff-fallback");
+        if (el) {
+          el.innerHTML = '<div style="max-width:340px;text-align:center;padding:20px;">'
+            + '<div style="font-size:28px;margin-bottom:10px;">⚠️</div>'
+            + '<div style="font-weight:700;margin-bottom:8px;">Couldn\'t load FitFuel</div>'
+            + '<div style="font-size:13px;color:#8B8D97;line-height:1.5;">This page needs an internet connection to load React and Babel from unpkg.com. '
+            + 'Check your connection, or disable any ad-blocker / privacy extension for this page, then refresh.</div>'
+            + '</div>';
+        }
+      }
+    }, 4000);
+  });
+</script>
+
+<!-- Application source, compiled in the browser by Babel. Order matters:
+     configuration and data first, then shared UI, then pages, then the app root. -->
+<script type="text/babel" src="js/01-config.js"></script>
+<script type="text/babel" src="js/02-calculations.js"></script>
+<script type="text/babel" src="js/03-data.js"></script>
+<script type="text/babel" src="js/04-ui-shared.js"></script>
+<script type="text/babel" src="js/05-landing-auth.js"></script>
+<script type="text/babel" src="js/06-cards-modals.js"></script>
+<script type="text/babel" src="js/07-activity.js"></script>
+<script type="text/babel" src="js/08-page-home.js"></script>
+<script type="text/babel" src="js/09-page-workouts.js"></script>
+<script type="text/babel" src="js/10-page-meals.js"></script>
+<script type="text/babel" src="js/11-page-nutrition.js"></script>
+<script type="text/babel" src="js/12-page-progress.js"></script>
+<script type="text/babel" src="js/13-page-profile.js"></script>
+<script type="text/babel" src="js/14-page-coach.js"></script>
+<script type="text/babel" src="js/15-page-settings.js"></script>
+<script type="text/babel" src="js/16-app.js"></script>
+
+<script>
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost")) {
+    window.addEventListener("load", () => navigator.serviceWorker.register("service-worker.js").catch(() => {}));
+  }
+</script>
+</body>
+</html>

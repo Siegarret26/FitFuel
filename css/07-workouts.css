@@ -1,0 +1,141 @@
+/* FitFuel — Workout cards, exercise rows and active sessions
+   Loaded by index.html in order. */
+
+.workout-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+  cursor: pointer;
+}
+.workout-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 16px 44px rgba(0,0,0,0.55), 0 0 0 1px var(--accent-tint-3);
+  border-color: var(--accent-tint-3);
+}
+.workout-card:hover .workout-card-img { transform: scale(1.06); }
+.workout-card-img-wrap { position: relative; overflow: hidden; aspect-ratio: 16/9; }
+.workout-card-img {
+  width: 100%; height: 100%; object-fit: cover;
+  display: block; transition: transform 0.5s ease;
+}
+.workout-card-img-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(7,7,9,0.85) 0%, transparent 55%);
+}
+.workout-card-chips {
+  position: absolute; top: 12px; left: 12px; right: 12px;
+  display: flex; justify-content: space-between; align-items: center;
+  gap: 8px;
+}
+.workout-dur-chip {
+  background: rgba(7,7,9,0.7); backdrop-filter: blur(6px);
+  border-radius: 20px; padding: 4px 11px;
+  font-size: 12px; font-weight: 700; color: #fff;
+  display: flex; align-items: center; gap: 4px;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+.workout-card-body { padding: 18px 20px 20px; }
+.workout-card-name { font-size: 17px; font-weight: 800; color: var(--text); margin-bottom: 6px; }
+.workout-card-desc { font-size: 13px; color: var(--text-mid); line-height: 1.55; margin-bottom: 16px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.workout-card-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; margin-top: -6px; }
+.workout-meta-chip { font-size: 11.5px; font-weight: 600; color: var(--text-mid); background: var(--bg3); border: 1px solid var(--border); border-radius: 20px; padding: 4px 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+/* ═══════════════════════════════════════════
+   EXERCISE INSTRUCTION DROPDOWN
+   (Feature 2 — expandable technique panel per exercise)
+═══════════════════════════════════════════ */
+.exercise-list { display: flex; flex-direction: column; gap: 8px; }
+.exercise-row {
+  background: var(--banner-pill-bg, var(--bg3));
+  border: 1px solid transparent;
+  border-radius: 12px;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+.exercise-row.done { background: var(--accent-tint-1); border-color: var(--accent-tint-3); }
+.exercise-row.rest-row { background: transparent; padding: 4px 12px; }
+.exercise-row-main {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; min-height: 20px;
+  user-select: none;
+}
+.exercise-row-cb {
+  width: 22px; height: 22px; border-radius: 6px; flex-shrink: 0;
+  border: 2px solid var(--border-strong);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: #fff; font-weight: 800;
+  transition: all 0.2s;
+}
+.exercise-row-cb.checked { background: var(--accent); border-color: var(--accent); }
+.exercise-row-text {
+  flex: 1; font-size: 13.5px; font-weight: 600;
+  color: var(--banner-pill-text, var(--text));
+  transition: all 0.2s;
+}
+.exercise-row.done .exercise-row-text { color: var(--accent); text-decoration: line-through; opacity: 0.75; }
+.exercise-detail { font-weight: 500; opacity: 0.6; margin-left: 6px; font-size: 12.5px; }
+.exercise-info-btn {
+  flex-shrink: 0;
+  width: 26px; height: 26px; border-radius: 50%;
+  border: 1.5px solid var(--accent-tint-4);
+  background: var(--accent-tint-1);
+  color: var(--accent);
+  font-size: 13px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s ease;
+}
+.exercise-info-btn:hover { background: var(--accent-tint-2); transform: scale(1.08); }
+.exercise-info-btn.open { background: var(--accent); color: #fff; border-color: var(--accent); }
+/* Grid-rows trick: animates height smoothly without knowing content size, ~300ms, no page jump */
+.exercise-info-panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 300ms cubic-bezier(.4,0,.2,1);
+}
+.exercise-info-panel.open { grid-template-rows: 1fr; }
+.exercise-info-inner { overflow: hidden; min-height: 0; }
+.exercise-info-divider { height: 1px; background: var(--border); margin: 0 12px; }
+.exercise-info-title {
+  font-size: 11px; font-weight: 700; color: var(--accent);
+  letter-spacing: 0.06em; text-transform: uppercase;
+  padding: 12px 14px 4px;
+}
+.exercise-info-list { list-style: none; padding: 0 14px 6px; display: flex; flex-direction: column; gap: 5px; }
+.exercise-info-list li {
+  font-size: 12.5px; line-height: 1.5; color: var(--info-body-text, var(--text-mid));
+  padding-left: 14px; position: relative;
+}
+.exercise-info-list li::before { content: "•"; position: absolute; left: 0; color: var(--accent); }
+.exercise-info-list.mistakes li::before { content: "✕"; color: var(--accent); font-size: 10px; top: 1px; }
+.exercise-info-muscles {
+  display: flex; flex-wrap: wrap; gap: 16px;
+  padding: 8px 14px 14px; font-size: 12.5px; color: var(--text);
+}
+.exercise-info-muscle-label {
+  display: block; font-size: 10px; font-weight: 700; color: var(--info-label-text, var(--text-light));
+  letter-spacing: 0.05em; text-transform: uppercase; margin-bottom: 2px;
+}
+.active-session-list .exercise-row { background: var(--banner-pill-bg); }
+.active-session-list .exercise-row.done { background: var(--accent-tint-1); }
+
+/* Workout detail modal reuses .meal-modal shell (see MEAL MODAL below) */
+.workout-modal .meal-modal-body { padding-top: 20px; }
+
+/* Active workout banner */
+.active-workout-banner {
+  background: linear-gradient(130deg, var(--accent-bg-deep) 0%, var(--accent-tint-3) 50%, var(--accent-bg-deep) 100%);
+  border: 1px solid var(--accent-tint-3);
+  border-radius: var(--r); padding: 28px;
+  margin-bottom: 32px;
+  box-shadow: 0 0 40px var(--accent-tint-2);
+}
+.timer-display {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 68px; color: var(--text); line-height: 1;
+  letter-spacing: 0.04em;
+}
+
+/* ═══════════════════════════════════════════
+   MEAL CARDS
+═══════════════════════════════════════════ */
